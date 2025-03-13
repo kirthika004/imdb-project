@@ -1,0 +1,36 @@
+
+import React from "react";
+import { useRouter } from "next/router";
+import Image from "next/image";
+
+export async function getServerSideProps(context) {
+  const { id } = context.params;
+  const res = await fetch(`https://api.example.com/actors/${id}`);
+  const actor = await res.json();
+
+  return {
+    props: { actor },
+  };
+}
+
+const ActorProfile = ({ actor }) => {
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <div className="flex items-center space-x-6">
+        <Image src={actor.profileImage} alt={actor.name} width={150} height={200} className="rounded-lg" />
+        <div>
+          <h1 className="text-3xl font-bold">{actor.name}</h1>
+          <p className="mt-2 text-gray-600">{actor.biography}</p>
+        </div>
+      </div>
+      <h2 className="text-2xl font-bold mt-6">Movies</h2>
+      <ul className="mt-4">
+        {actor.movies.map((movie) => (
+          <li key={movie.id} className="mt-2">{movie.title} ({movie.year})</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default ActorProfile;

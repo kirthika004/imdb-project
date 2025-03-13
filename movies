@@ -1,0 +1,78 @@
+import React from "react";
+import { useRouter } from "next/router";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
+import { Pagination, Autoplay } from "swiper/modules";
+
+export async function getServerSideProps(context) {
+  const { id } = context.params;
+  const res = await fetch(`https://api.example.com/movies/${id}`); // Replace with actual API
+  const movie = await res.json();
+
+  return {
+    props: { movie },
+  };
+}
+
+const MovieDetails = ({ movie }) => {
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <div className="flex items-center space-x-6">
+        <Image src={movie.poster} alt={movie.title} width={200} height={300} className="rounded-lg" />
+        <div>
+          <h1 className="text-3xl font-bold">{movie.title}</h1>
+          <p className="mt-2 text-gray-600">{movie.overview}</p>
+          <h2 className="text-xl font-bold mt-4">Cast</h2>
+          <ul>
+            {movie.cast.map((actor) => (
+              <li key={actor.id}>{actor.name} as {actor.character}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      
+      <h2 className="text-2xl font-bold mt-6">Trailers & Images</h2>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <Swiper
+          modules={[Pagination, Autoplay]}
+          spaceBetween={10}
+          slidesPerView={1}
+          pagination={{ clickable: true }}
+          autoplay={{ delay: 3000 }}
+          lazy={true}
+          className="mt-4"
+        >
+          {movie.trailers.map((trailer) => (
+            <SwiperSlide key={trailer.id}>
+              <iframe
+                src={trailer.url}
+                title={trailer.name}
+                className="w-full h-64 rounded-lg"
+                allowFullScreen
+              ></iframe>
+            </SwiperSlide>
+          ))}
+          {movie.images.map((image, index) => (
+            <SwiperSlide key={index}>
+              <Image src={image} alt="Movie Scene" width={800} height={450} className="rounded-lg" />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </motion.div>
+
+      <h2 className="text-2xl font-bold mt-6">Reviews</h2>
+      <ul className="mt-4">
+        {movie.reviews.map((review) => (
+          <li key={review.id} className="mb-4 border-b pb-2">
+            <strong>{review.author}</strong>: {review.content}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default MovieDetails;
