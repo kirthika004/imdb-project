@@ -1,0 +1,7 @@
+[build]
+  command = "npm run build"  # Adjust based on your framework
+  publish = "build"  # Change to "dist" for Vite, "public" for Gatsby, "out" for Next.js
+
+[build.environment]
+  NODE_VERSION = "20"
+S
